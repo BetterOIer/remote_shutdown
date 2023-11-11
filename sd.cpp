@@ -1,9 +1,10 @@
 #include <iostream>  
 #include <cstring>  
 #include <sys/socket.h>  
+#include <netdb.h>
 #include <arpa/inet.h>  
 #include <unistd.h>  
-  
+hostent *host;
 int main() {  
     int sock = 0, valread;  
     struct sockaddr_in serv_addr;  
@@ -19,10 +20,12 @@ int main() {
     // 设置目标服务器地址和端口号  
     serv_addr.sin_family = AF_INET;  
     serv_addr.sin_port = htons(2000);  
-    if (inet_pton(AF_INET, "betteroier.site", &serv_addr.sin_addr) <= 0) {  
+    host = gethostbyname("betteroier.site");
+    serv_addr.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr *)host->h_addr_list[0]));
+    /* if (inet_pton(AF_INET, "betteroier.site", &serv_addr.sin_addr) <= 0) {  
         perror("inet_pton failed");  
         exit(EXIT_FAILURE);  
-    }  
+    }   */
   
     // 连接到目标服务器  
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {  
